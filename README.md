@@ -42,6 +42,11 @@ cafe-finder/
 2. Install root dependencies: `npm install`
 3. Install server dependencies: `cd server && npm install`
 4. Install client dependencies: `cd client && npm install`
+5. Set up database:
+   - Create PostgreSQL database named `cafe_finder`
+   - Run schema: `psql -U postgres cafe_finder < server/src/db/schema.sql`
+   - Seed sample data: `node server/src/db/seed.js`
+6. Create `.env` file in server folder (copy from `.env.example`)
 
 ### Development
 
@@ -65,7 +70,7 @@ npm run build
 ## Development Roadmap
 
 - [x] Step 1: Foundation & Project Setup
-- [ ] Step 2: Menu & Product Listing
+- [x] Step 2: Menu & Product Listing
 - [ ] Step 3: Shopping Cart & Checkout
 - [ ] Step 4: User System & Authentication
 - [ ] Step 5: Orders & Order Tracking

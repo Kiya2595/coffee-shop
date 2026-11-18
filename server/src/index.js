@@ -2,6 +2,7 @@ import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import bodyParser from 'body-parser';
+import productsRouter from './routes/products.js';
 
 dotenv.config();
 
@@ -23,8 +24,11 @@ app.get('/api/health', (req, res) => {
 
 // Basic route
 app.get('/api', (req, res) => {
-  res.json({ message: 'Welcome to Cafe Finder API', version: '0.1.0' });
+  res.json({ message: 'Welcome to Coffee Shop API', version: '0.2.0' });
 });
+
+// Routes
+app.use('/api/products', productsRouter);
 
 // 404 handler
 app.use((req, res) => {
