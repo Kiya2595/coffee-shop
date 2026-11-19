@@ -2,14 +2,20 @@ import { useEffect, useState } from 'react';
 import './App.css';
 import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
 import { CartProvider, useCart } from './context/CartContext';
+import { AuthProvider, useAuth } from './context/AuthContext';
 import Home from './pages/Home';
+import Profile from './pages/Profile';
 import Cart from './components/Cart';
 import Checkout from './components/Checkout';
 import OrderConfirmation from './components/OrderConfirmation';
 import ProductList from './components/ProductList';
+import Login from './components/Login';
+import Register from './components/Register';
+import ProtectedRoute from './components/ProtectedRoute';
 
 function Navigation() {
   const { getCartItemCount } = useCart();
+  const { user, isAuthenticated, logout } = useAuth();
 
   return (
     <nav className="bg-white shadow-sm sticky top-0 z-50">
@@ -25,9 +31,31 @@ function Navigation() {
             <Link to="/cart" className="px-4 py-2 text-gray-600 hover:text-gray-900">
               Cart ({getCartItemCount()})
             </Link>
-            <a href="#" className="px-4 py-2 text-gray-600 hover:text-gray-900">
-              Account
-            </a>
+            {isAuthenticated ? (
+              <>
+                <Link to="/profile" className="px-4 py-2 text-gray-600 hover:text-gray-900">
+                  {user?.firstName}
+                </Link>
+                <button
+                  onClick={logout}
+                  className="px-4 py-2 text-red-600 hover:text-red-800"
+                >
+                  Logout
+                </button>
+              </>
+            ) : (
+              <>
+                <Link to="/login" className="px-4 py-2 text-gray-600 hover:text-gray-900">
+                  Login
+                </Link>
+                <Link
+                  to="/register"
+                  className="px-4 py-2 bg-amber-700 text-white rounded-lg hover:bg-amber-800"
+                >
+                  Register
+                </Link>
+              </>
+            )}
           </div>
         </div>
       </div>
@@ -49,9 +77,29 @@ function AppContent() {
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/menu" element={<ProductList onAddToCart={handleAddToCart} />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/register" element={<Register />} />
         <Route path="/cart" element={<Cart />} />
-        <Route path="/checkout" element={<Checkout />} />
-        <Route path="/order-confirmation/:orderId" element={<OrderConfirmation />} />
+        <Route
+          path="/checkout"
+          element={
+            <ProtectedRoute>
+              <Checkout />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/order-confirmation/:orderId"
+          element={<OrderConfirmation />}
+        />
+        <Route
+          path="/profile"
+          element={
+            <ProtectedRoute>
+              <Profile />
+            </ProtectedRoute>
+          }
+        />
       </Routes>
     </>
   );
@@ -60,9 +108,11 @@ function AppContent() {
 function App() {
   return (
     <Router>
-      <CartProvider>
-        <AppContent />
-      </CartProvider>
+      <AuthProvider>
+        <CartProvider>
+          <AppContent />
+        </CartProvider>
+      </AuthProvider>
     </Router>
   );
 }

@@ -1,10 +1,11 @@
 import express from 'express';
 import pool from '../db/connection.js';
+import { optionalAuthMiddleware } from '../middleware/auth.js';
 
 const router = express.Router();
 
 // Create new order
-router.post('/', async (req, res) => {
+router.post('/', optionalAuthMiddleware, async (req, res) => {
   const client = await pool.connect();
   
   try {
@@ -18,10 +19,10 @@ router.post('/', async (req, res) => {
 
     // Create order
     const orderResult = await client.query(
-      `INSERT INTO orders (total_price, status, notes)
-       VALUES ($1, $2, $3)
+      `INSERT INTO orders (user_id, total_price, status, notes)
+       VALUES ($1, $2, $3, $4)
        RETURNING id, total_price, status, created_at;`,
-      [total_price, 'pending', notes || null]
+      [req.user?.userId || null, total_price, 'pending', notes || null]
     );
 
     const order = orderResult.rows[0];
@@ -65,10 +66,27 @@ router.post('/', async (req, res) => {
   }
 });
 
+// Get user's orders (requires auth)
+router.get('/my-orders', async (req, res) => {
+  try {
+    const authHeader = req.headers.authorization;
+    
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      return res.status(401).json({ error: 'Authentication required' });
+    }
+
+    // For now, just return a message - proper auth middleware will be added
+    res.json({ message: 'Get user orders endpoint' });
+  } catch (err) {
+    console.error('Error fetching user orders:', err);
+    res.status(500).json({ error: 'Failed to fetch orders' });
+  }
+});
+
 // Get all orders (for testing)
 router.get('/', async (req, res) => {
   try {
-    const result = await client.query(
+    const result = await pool.query(
       `SELECT o.id, o.total_price, o.status, o.created_at, o.updated_at,
               COUNT(oi.id) as item_count
        FROM orders o

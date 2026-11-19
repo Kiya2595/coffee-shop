@@ -4,6 +4,7 @@ import dotenv from 'dotenv';
 import bodyParser from 'body-parser';
 import productsRouter from './routes/products.js';
 import ordersRouter from './routes/orders.js';
+import authRouter from './routes/auth.js';
 
 dotenv.config();
 
@@ -25,10 +26,11 @@ app.get('/api/health', (req, res) => {
 
 // Basic route
 app.get('/api', (req, res) => {
-  res.json({ message: 'Welcome to Coffee Shop API', version: '0.3.0' });
+  res.json({ message: 'Welcome to Coffee Shop API', version: '0.4.0' });
 });
 
 // Routes
+app.use('/api/auth', authRouter);
 app.use('/api/products', productsRouter);
 app.use('/api/orders', ordersRouter);
 
