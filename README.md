@@ -71,7 +71,7 @@ npm run build
 
 - [x] Step 1: Foundation & Project Setup
 - [x] Step 2: Menu & Product Listing
-- [ ] Step 3: Shopping Cart & Checkout
+- [x] Step 3: Shopping Cart & Checkout
 - [ ] Step 4: User System & Authentication
 - [ ] Step 5: Orders & Order Tracking
 - [ ] Step 6: Reviews & Ratings

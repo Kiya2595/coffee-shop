@@ -23,4 +23,15 @@ export const productService = {
   getCategories: () => api.get('/products/meta/categories'),
 };
 
+// Orders API
+export const orderService = {
+  create: (orderData) => api.post('/orders', orderData),
+  
+  getAll: () => api.get('/orders'),
+  
+  getById: (id) => api.get(`/orders/${id}`),
+  
+  updateStatus: (id, status) => api.patch(`/orders/${id}/status`, { status }),
+};
+
 export default api;
