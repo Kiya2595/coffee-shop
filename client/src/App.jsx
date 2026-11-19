@@ -5,6 +5,9 @@ import { CartProvider, useCart } from './context/CartContext';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import Home from './pages/Home';
 import Profile from './pages/Profile';
+import OrderHistory from './pages/OrderHistory';
+import OrderDetails from './pages/OrderDetails';
+import AdminOrders from './pages/AdminOrders';
 import Cart from './components/Cart';
 import Checkout from './components/Checkout';
 import OrderConfirmation from './components/OrderConfirmation';
@@ -99,6 +102,22 @@ function AppContent() {
               <Profile />
             </ProtectedRoute>
           }
+        />
+        <Route
+          path="/orders"
+          element={
+            <ProtectedRoute>
+              <OrderHistory />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/order/:orderId"
+          element={<OrderDetails />}
+        />
+        <Route
+          path="/admin/orders"
+          element={<AdminOrders />}
         />
       </Routes>
     </>

@@ -29,6 +29,8 @@ export const orderService = {
   
   getAll: () => api.get('/orders'),
   
+  getMyOrders: () => api.get('/orders/my-orders'),
+  
   getById: (id) => api.get(`/orders/${id}`),
   
   updateStatus: (id, status) => api.patch(`/orders/${id}/status`, { status }),

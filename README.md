@@ -73,7 +73,7 @@ npm run build
 - [x] Step 2: Menu & Product Listing
 - [x] Step 3: Shopping Cart & Checkout
 - [x] Step 4: User System & Authentication
-- [ ] Step 5: Orders & Order Tracking
+- [x] Step 5: Orders & Order Tracking
 - [ ] Step 6: Reviews & Ratings
 - [ ] Step 7: Admin Dashboard
 - [ ] Step 8: Payment Integration & Inventory

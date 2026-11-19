@@ -1,6 +1,7 @@
 import express from 'express';
 import pool from '../db/connection.js';
 import { optionalAuthMiddleware } from '../middleware/auth.js';
+import { authMiddleware } from '../middleware/auth.js';
 
 const router = express.Router();
 
@@ -67,31 +68,39 @@ router.post('/', optionalAuthMiddleware, async (req, res) => {
 });
 
 // Get user's orders (requires auth)
-router.get('/my-orders', async (req, res) => {
+router.get('/my-orders', authMiddleware, async (req, res) => {
   try {
-    const authHeader = req.headers.authorization;
-    
-    if (!authHeader || !authHeader.startsWith('Bearer ')) {
-      return res.status(401).json({ error: 'Authentication required' });
-    }
+    const userId = req.user.userId;
 
-    // For now, just return a message - proper auth middleware will be added
-    res.json({ message: 'Get user orders endpoint' });
+    const result = await pool.query(
+      `SELECT o.id, o.total_price, o.status, o.created_at, o.updated_at,
+              COUNT(oi.id) as item_count
+       FROM orders o
+       LEFT JOIN order_items oi ON o.id = oi.order_id
+       WHERE o.user_id = $1
+       GROUP BY o.id
+       ORDER BY o.created_at DESC;`,
+      [userId]
+    );
+
+    res.json(result.rows);
   } catch (err) {
     console.error('Error fetching user orders:', err);
     res.status(500).json({ error: 'Failed to fetch orders' });
   }
 });
 
-// Get all orders (for testing)
+// Get all orders (for admin, no auth for now)
 router.get('/', async (req, res) => {
   try {
     const result = await pool.query(
-      `SELECT o.id, o.total_price, o.status, o.created_at, o.updated_at,
-              COUNT(oi.id) as item_count
+      `SELECT o.id, o.user_id, o.total_price, o.status, o.created_at, o.updated_at,
+              COUNT(oi.id) as item_count,
+              u.first_name, u.last_name, u.email
        FROM orders o
        LEFT JOIN order_items oi ON o.id = oi.order_id
-       GROUP BY o.id
+       LEFT JOIN users u ON o.user_id = u.id
+       GROUP BY o.id, u.id
        ORDER BY o.created_at DESC;`
     );
 
@@ -102,14 +111,15 @@ router.get('/', async (req, res) => {
   }
 });
 
-// Get single order by ID
+// Get single order by ID (with user details if exists)
 router.get('/:id', async (req, res) => {
   try {
     const { id } = req.params;
 
     const result = await pool.query(
       `SELECT 
-        o.id, o.total_price, o.status, o.notes, o.created_at, o.updated_at,
+        o.id, o.user_id, o.total_price, o.status, o.notes, o.created_at, o.updated_at,
+        u.first_name, u.last_name, u.email, u.phone,
         json_agg(json_build_object(
           'id', p.id,
           'name', p.name,
@@ -119,8 +129,9 @@ router.get('/:id', async (req, res) => {
        FROM orders o
        LEFT JOIN order_items oi ON o.id = oi.order_id
        LEFT JOIN products p ON oi.product_id = p.id
+       LEFT JOIN users u ON o.user_id = u.id
        WHERE o.id = $1
-       GROUP BY o.id, o.total_price, o.status, o.notes, o.created_at, o.updated_at;`,
+       GROUP BY o.id, u.id;`,
       [id]
     );
 

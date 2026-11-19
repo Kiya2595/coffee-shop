@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 
 export default function Profile() {
@@ -147,6 +147,30 @@ export default function Profile() {
       </div>
 
       <div className="bg-white rounded-lg shadow-md p-8">
+        <h2 className="text-xl font-bold text-gray-900 mb-4">Quick Links</h2>
+        <div className="space-y-3">
+          <Link
+            to="/orders"
+            className="block px-4 py-3 bg-amber-50 text-amber-700 rounded-lg hover:bg-amber-100 transition font-medium"
+          >
+            📋 View Order History
+          </Link>
+        </div>
+      </div>
+
+      <div className="bg-white rounded-lg shadow-md p-8 mt-8">
+        <h2 className="text-xl font-bold text-gray-900 mb-4">Admin</h2>
+        <div className="space-y-3">
+          <Link
+            to="/admin/orders"
+            className="block px-4 py-3 bg-purple-50 text-purple-700 rounded-lg hover:bg-purple-100 transition font-medium"
+          >
+            📊 Manage Orders
+          </Link>
+        </div>
+      </div>
+
+      <div className="bg-white rounded-lg shadow-md p-8 mt-8">
         <h2 className="text-xl font-bold text-gray-900 mb-4">Account Actions</h2>
         <button
           onClick={handleLogout}
